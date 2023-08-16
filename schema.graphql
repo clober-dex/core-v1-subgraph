@@ -22,7 +22,7 @@ type Depth @entity {
     price: BigInt!
     isBid: Boolean!
     rawAmount: BigInt!
-    amount: BigInt!
+    baseAmount: BigInt!
 }
 
 type Token @entity {

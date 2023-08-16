@@ -26,7 +26,7 @@ export function handleTakeOrder(event: TakeOrder): void {
     priceIndex,
   )
   depth.rawAmount = rawAmount
-  depth.amount =
+  depth.baseAmount =
     isTakingBidSide === 1
       ? orderBookContract.rawToQuote(rawAmount)
       : orderBookContract.rawToBase(rawAmount, priceIndex, false)
