@@ -5,29 +5,72 @@ import {
   OrderNFT as OrderNFTContract,
 } from '../generated/templates/OrderNFT/OrderNFT'
 import { OrderBook as OrderBookContract } from '../generated/templates/OrderNFT/OrderBook'
-import { Depth } from '../generated/schema'
+import { Depth, OpenOrder } from '../generated/schema'
 
-import { ADDRESS_ZERO } from './helpers'
+import {
+  ADDRESS_ZERO,
+  buildOpenOrderId,
+  buildOrderKey,
+  decodeIsBidFromNftId,
+  decodeOrderIndexFromNftId,
+  decodePriceIndexFromNftId,
+} from './helpers'
 
 export function handleNFTTransfer(event: Transfer): void {
-  if (
-    event.params.from.toHexString() != ADDRESS_ZERO &&
-    event.params.to.toHexString() != ADDRESS_ZERO
-  ) {
-    return
-  }
-
+  const from = event.params.from.toHexString()
+  const to = event.params.to.toHexString()
   const orderNFTContract = OrderNFTContract.bind(event.address)
   const marketAddress = orderNFTContract.market()
-
   const orderBookContract = OrderBookContract.bind(marketAddress)
-  const tokenId = event.params.tokenId
-  const isBid = tokenId.rightShift(248).toU64()
-  const bidSide = isBid === 1
-  const priceIndex = tokenId
-    .rightShift(232)
-    .bitAnd(BigInt.fromI32(2).pow(16).minus(BigInt.fromI32(1)))
-    .toI32()
+  const nftId = event.params.tokenId
+  const bidSide = decodeIsBidFromNftId(nftId)
+  const isBid = bidSide ? 1 : 0
+  const priceIndex = decodePriceIndexFromNftId(nftId).toI32()
+  const price = orderBookContract.indexToPrice(priceIndex as i32)
+  const orderIndex = decodeOrderIndexFromNftId(nftId)
+
+  /// open order
+  const orderInfo = orderBookContract.getOrder(
+    buildOrderKey(bidSide, priceIndex, orderIndex),
+  )
+  const openOrderId = buildOpenOrderId(marketAddress, nftId)
+  let openOrder = OpenOrder.load(openOrderId)
+  if (openOrder === null) {
+    openOrder = new OpenOrder(openOrderId)
+  }
+
+  if (from == ADDRESS_ZERO) {
+    openOrder.market = marketAddress.toHexString()
+    openOrder.priceIndex = BigInt.fromI32(priceIndex as i32)
+    openOrder.price = price
+    openOrder.isBid = bidSide
+    openOrder.orderIndex = orderIndex
+    openOrder.rawAmount = orderInfo.amount
+    openOrder.baseAmount = orderBookContract.rawToBase(
+      orderInfo.amount,
+      priceIndex as i32,
+      false,
+    )
+    openOrder.rawFilledAmount = BigInt.zero()
+    openOrder.baseFilledAmount = BigInt.zero()
+    openOrder.rawClaimedAmount = BigInt.zero()
+    openOrder.baseClaimedAmount = BigInt.zero()
+    openOrder.bountyAmount = orderInfo.claimBounty
+    openOrder.createdAt = event.block.timestamp
+    openOrder.txHash = event.transaction.hash.toHexString()
+    openOrder.user = to
+    openOrder.save()
+  } else if (to == ADDRESS_ZERO) {
+    store.remove('OpenOrder', openOrderId)
+  } else {
+    openOrder.user = to
+    openOrder.save()
+  }
+
+  // depth
+  if (from != ADDRESS_ZERO && to != ADDRESS_ZERO) {
+    return
+  }
 
   const depthId = marketAddress
     .toHexString()
@@ -36,28 +79,23 @@ export function handleNFTTransfer(event: Transfer): void {
     .concat('-')
     .concat(isBid.toString())
   let depth = Depth.load(depthId)
-  let rawAmount = BigInt.fromI32(0)
+  const depthRawAmount = orderBookContract.getDepth(bidSide, priceIndex as i32)
   if (depth === null) {
     depth = new Depth(depthId)
     depth.market = marketAddress.toHexString()
-    depth.priceIndex = BigInt.fromI32(priceIndex)
-    depth.price = orderBookContract.indexToPrice(priceIndex)
+    depth.priceIndex = BigInt.fromI32(priceIndex as i32)
+    depth.price = price
     depth.isBid = bidSide
-
-    rawAmount = orderBookContract.getDepth(bidSide, priceIndex)
-    depth.rawAmount = rawAmount
-    depth.baseAmount = bidSide
-      ? orderBookContract.rawToQuote(rawAmount)
-      : orderBookContract.rawToBase(rawAmount, priceIndex, false)
-  } else {
-    rawAmount = orderBookContract.getDepth(bidSide, priceIndex)
-    depth.rawAmount = rawAmount
-    depth.baseAmount = bidSide
-      ? orderBookContract.rawToQuote(rawAmount)
-      : orderBookContract.rawToBase(rawAmount, priceIndex, false)
+    depth.latestTakenOrderIndex = BigInt.zero()
   }
+  depth.rawAmount = depthRawAmount
+  depth.baseAmount = orderBookContract.rawToBase(
+    depthRawAmount,
+    priceIndex as i32,
+    false,
+  )
 
-  if (rawAmount.equals(BigInt.fromI32(0))) {
+  if (depthRawAmount.equals(BigInt.fromI32(0))) {
     store.remove('Depth', depthId)
   } else {
     depth.save()

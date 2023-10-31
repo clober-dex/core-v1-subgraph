@@ -12,6 +12,10 @@ type Market @entity {
     d: BigInt!
 
     depths: [Depth!]! @derivedFrom(field: "market")
+    openOrders: [OpenOrder!]! @derivedFrom(field: "market")
+
+    latestPriceIndex: BigInt!
+    latestPrice: BigInt!
 }
 
 type Depth @entity {
@@ -23,6 +27,7 @@ type Depth @entity {
     isBid: Boolean!
     rawAmount: BigInt!
     baseAmount: BigInt!
+    latestTakenOrderIndex: BigInt!
 }
 
 type Token @entity {
@@ -33,4 +38,24 @@ type Token @entity {
     name: String!
     # token decimals
     decimals: BigInt!
+}
+
+type OpenOrder @entity {
+    # market address + "-" + nftId
+    id: ID!
+    market: Market!
+    priceIndex: BigInt!
+    price: BigInt!
+    isBid: Boolean!
+    orderIndex: BigInt!
+    rawAmount: BigInt!
+    baseAmount: BigInt!
+    rawFilledAmount: BigInt!
+    baseFilledAmount: BigInt!
+    rawClaimedAmount: BigInt!
+    baseClaimedAmount: BigInt!
+    bountyAmount: BigInt!
+    createdAt: BigInt!
+    txHash: String!
+    user: String!
 }
