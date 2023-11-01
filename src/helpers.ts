@@ -22,12 +22,12 @@ export function createToken(tokenAddress: Address): Token {
 
 export function buildOrderKey(
   isBid: boolean,
-  priceIndex: number,
+  priceIndex: i32,
   orderIndex: BigInt,
 ): OrderBook__getOrderInputOrderKeyStruct {
   const fixedSizedArray: Array<ethereum.Value> = [
     ethereum.Value.fromBoolean(isBid),
-    ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(priceIndex as i32)),
+    ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(priceIndex)),
     ethereum.Value.fromUnsignedBigInt(orderIndex),
   ]
   return changetype<OrderBook__getOrderInputOrderKeyStruct>(fixedSizedArray)
@@ -49,12 +49,12 @@ export function buildOpenOrderId(
 
 export function encodeToNftId(
   isBid: boolean,
-  priceIndex: number,
+  priceIndex: i32,
   orderIndex: BigInt,
 ): BigInt {
   return BigInt.fromI32(isBid ? 1 : 0)
     .leftShift(248)
-    .plus(BigInt.fromI32(priceIndex as i32).leftShift(232))
+    .plus(BigInt.fromI32(priceIndex).leftShift(232))
     .plus(orderIndex)
 }
 
@@ -62,10 +62,11 @@ export function decodeIsBidFromNftId(nftId: BigInt): boolean {
   return nftId.rightShift(248).toU64() === 1
 }
 
-export function decodePriceIndexFromNftId(nftId: BigInt): BigInt {
+export function decodePriceIndexFromNftId(nftId: BigInt): i32 {
   return nftId
     .rightShift(232)
     .bitAnd(BigInt.fromI32(2).pow(16).minus(BigInt.fromI32(1)))
+    .toI32()
 }
 
 export function decodeOrderIndexFromNftId(nftId: BigInt): BigInt {

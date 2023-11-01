@@ -25,8 +25,8 @@ export function handleNFTTransfer(event: Transfer): void {
   const nftId = event.params.tokenId
   const bidSide = decodeIsBidFromNftId(nftId)
   const isBid = bidSide ? 1 : 0
-  const priceIndex = decodePriceIndexFromNftId(nftId).toI32()
-  const price = orderBookContract.indexToPrice(priceIndex as i32)
+  const priceIndex = decodePriceIndexFromNftId(nftId)
+  const price = orderBookContract.indexToPrice(priceIndex)
   const orderIndex = decodeOrderIndexFromNftId(nftId)
 
   /// open order
@@ -41,14 +41,14 @@ export function handleNFTTransfer(event: Transfer): void {
 
   if (from == ADDRESS_ZERO) {
     openOrder.market = marketAddress.toHexString()
-    openOrder.priceIndex = BigInt.fromI32(priceIndex as i32)
+    openOrder.priceIndex = BigInt.fromI32(priceIndex)
     openOrder.price = price
     openOrder.isBid = bidSide
     openOrder.orderIndex = orderIndex
     openOrder.rawAmount = orderInfo.amount
     openOrder.baseAmount = orderBookContract.rawToBase(
       orderInfo.amount,
-      priceIndex as i32,
+      priceIndex,
       false,
     )
     openOrder.rawFilledAmount = BigInt.zero()
@@ -79,11 +79,11 @@ export function handleNFTTransfer(event: Transfer): void {
     .concat('-')
     .concat(isBid.toString())
   let depth = Depth.load(depthId)
-  const depthRawAmount = orderBookContract.getDepth(bidSide, priceIndex as i32)
+  const depthRawAmount = orderBookContract.getDepth(bidSide, priceIndex)
   if (depth === null) {
     depth = new Depth(depthId)
     depth.market = marketAddress.toHexString()
-    depth.priceIndex = BigInt.fromI32(priceIndex as i32)
+    depth.priceIndex = BigInt.fromI32(priceIndex)
     depth.price = price
     depth.isBid = bidSide
     depth.latestTakenOrderIndex = BigInt.zero()
@@ -91,7 +91,7 @@ export function handleNFTTransfer(event: Transfer): void {
   depth.rawAmount = depthRawAmount
   depth.baseAmount = orderBookContract.rawToBase(
     depthRawAmount,
-    priceIndex as i32,
+    priceIndex,
     false,
   )
 

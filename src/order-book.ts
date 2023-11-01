@@ -40,8 +40,8 @@ export function handleTakeOrder(event: TakeOrder): void {
   )
 
   let currentOrderIndex = depth.latestTakenOrderIndex
-  let rawAmount = event.params.rawAmount
-  while (rawAmount.gt(BigInt.zero())) {
+  let remainingTakenRawAmount = event.params.rawAmount
+  while (remainingTakenRawAmount.gt(BigInt.zero())) {
     const nftId = encodeToNftId(
       isTakingBidSide === 1,
       priceIndex,
@@ -59,14 +59,16 @@ export function handleTakeOrder(event: TakeOrder): void {
     const openOrderRemainingRawAmount = openOrder.rawAmount.minus(
       openOrder.rawFilledAmount,
     )
-    const filledRawAmount = rawAmount.lt(openOrderRemainingRawAmount)
-      ? rawAmount
+    const filledRawAmount = remainingTakenRawAmount.lt(
+      openOrderRemainingRawAmount,
+    )
+      ? remainingTakenRawAmount
       : openOrderRemainingRawAmount
     openOrder.rawFilledAmount = openOrder.rawFilledAmount.plus(filledRawAmount)
     openOrder.baseFilledAmount = openOrder.baseFilledAmount.plus(
       orderBookContract.rawToBase(filledRawAmount, priceIndex, false),
     )
-    rawAmount = rawAmount.minus(filledRawAmount)
+    remainingTakenRawAmount = remainingTakenRawAmount.minus(filledRawAmount)
     openOrder.save()
   }
   depth.latestTakenOrderIndex = currentOrderIndex.minus(BigInt.fromI32(1))
