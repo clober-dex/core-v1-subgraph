@@ -25,6 +25,8 @@ export function handleCreateStableMarket(event: CreateStableMarket): void {
   market.a = event.params.a
   market.d = event.params.d
   market.r = BigInt.fromI32(0)
+  market.latestPriceIndex = BigInt.zero()
+  market.latestPrice = BigInt.zero()
 
   // create the tracked contract based on the template
   OrderNFTTemplate.create(event.params.orderToken)
@@ -46,6 +48,8 @@ export function handleCreateVolatileMarket(event: CreateVolatileMarket): void {
   market.a = event.params.a
   market.d = BigInt.fromI32(0)
   market.r = event.params.r
+  market.latestPriceIndex = BigInt.zero()
+  market.latestPrice = BigInt.zero()
 
   // create the tracked contract based on the template
   OrderNFTTemplate.create(event.params.orderToken)

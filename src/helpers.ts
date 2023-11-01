@@ -1,9 +1,10 @@
-import { BigInt, Address } from '@graphprotocol/graph-ts'
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
 
 import { ERC20 } from '../generated/MarketFactory/ERC20'
 import { ERC20SymbolBytes } from '../generated/MarketFactory/ERC20SymbolBytes'
 import { ERC20NameBytes } from '../generated/MarketFactory/ERC20NameBytes'
 import { Token } from '../generated/schema'
+import { OrderBook__getOrderInputOrderKeyStruct } from '../generated/templates/OrderNFT/OrderBook'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 
@@ -19,11 +20,57 @@ export function createToken(tokenAddress: Address): Token {
   return token
 }
 
+export function buildOrderKey(
+  isBid: boolean,
+  priceIndex: i32,
+  orderIndex: BigInt,
+): OrderBook__getOrderInputOrderKeyStruct {
+  const fixedSizedArray: Array<ethereum.Value> = [
+    ethereum.Value.fromBoolean(isBid),
+    ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(priceIndex)),
+    ethereum.Value.fromUnsignedBigInt(orderIndex),
+  ]
+  return changetype<OrderBook__getOrderInputOrderKeyStruct>(fixedSizedArray)
+}
+
 export function isNullEthValue(value: string): boolean {
   return (
     value ==
     '0x0000000000000000000000000000000000000000000000000000000000000001'
   )
+}
+
+export function buildOpenOrderId(
+  marketAddress: Address,
+  nftId: BigInt,
+): string {
+  return marketAddress.toHexString().concat('-').concat(nftId.toString())
+}
+
+export function encodeToNftId(
+  isBid: boolean,
+  priceIndex: i32,
+  orderIndex: BigInt,
+): BigInt {
+  return BigInt.fromI32(isBid ? 1 : 0)
+    .leftShift(248)
+    .plus(BigInt.fromI32(priceIndex).leftShift(232))
+    .plus(orderIndex)
+}
+
+export function decodeIsBidFromNftId(nftId: BigInt): boolean {
+  return nftId.rightShift(248).toU64() === 1
+}
+
+export function decodePriceIndexFromNftId(nftId: BigInt): i32 {
+  return nftId
+    .rightShift(232)
+    .bitAnd(BigInt.fromI32(2).pow(16).minus(BigInt.fromI32(1)))
+    .toI32()
+}
+
+export function decodeOrderIndexFromNftId(nftId: BigInt): BigInt {
+  return nftId.bitAnd(BigInt.fromI32(2).pow(232).minus(BigInt.fromI32(1)))
 }
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
