@@ -92,7 +92,7 @@ export function handleNFTTransfer(event: Transfer): void {
   depth.baseAmount = orderBookContract.rawToBase(
     depthRawAmount,
     priceIndex,
-    false,
+    true,
   )
 
   if (depthRawAmount.equals(BigInt.fromI32(0))) {

@@ -36,7 +36,7 @@ export function handleTakeOrder(event: TakeOrder): void {
   depth.baseAmount = orderBookContract.rawToBase(
     depthRawAmount,
     priceIndex,
-    false,
+    true,
   )
 
   let currentOrderIndex = depth.latestTakenOrderIndex
