@@ -40,17 +40,16 @@ export function handleNFTTransfer(event: Transfer): void {
   }
 
   if (from == ADDRESS_ZERO) {
+    // MakeOrder
     openOrder.market = marketAddress.toHexString()
     openOrder.priceIndex = BigInt.fromI32(priceIndex)
     openOrder.price = price
     openOrder.isBid = bidSide
     openOrder.orderIndex = orderIndex
     openOrder.rawAmount = orderInfo.amount
-    openOrder.baseAmount = orderBookContract.rawToBase(
-      orderInfo.amount,
-      priceIndex,
-      false,
-    )
+    openOrder.amount = bidSide
+      ? orderBookContract.rawToQuote(orderInfo.amount)
+      : orderBookContract.rawToBase(orderInfo.amount, priceIndex, true)
     openOrder.rawFilledAmount = BigInt.zero()
     openOrder.baseFilledAmount = BigInt.zero()
     openOrder.rawClaimedAmount = BigInt.zero()
