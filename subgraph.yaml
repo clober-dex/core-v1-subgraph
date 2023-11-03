@@ -29,6 +29,8 @@ dataSources:
           file: ./abis/OrderNFT.json
         - name: OrderBook
           file: ./abis/OrderBook.json
+        - name: PriceBook
+          file: ./abis/PriceBook.json
       eventHandlers:
         - event: CreateStableMarket(indexed address,address,address,address,uint256,uint256,int24,uint24,uint128,uint128)
           handler: handleCreateStableMarket
