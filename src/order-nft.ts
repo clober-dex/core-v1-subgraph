@@ -51,7 +51,7 @@ export function handleNFTTransfer(event: Transfer): void {
       ? orderBookContract.rawToQuote(orderInfo.amount)
       : orderBookContract.rawToBase(orderInfo.amount, priceIndex, true)
     openOrder.rawFilledAmount = BigInt.zero()
-    openOrder.baseFilledAmount = BigInt.zero()
+    openOrder.filledAmount = BigInt.zero()
     openOrder.rawClaimedAmount = BigInt.zero()
     openOrder.baseClaimedAmount = BigInt.zero()
     openOrder.bountyAmount = orderInfo.claimBounty

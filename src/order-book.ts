@@ -13,6 +13,7 @@ export function handleTakeOrder(event: TakeOrder): void {
   const marketAddress = event.address
   const priceIndex = event.params.priceIndex
   const isTakingBidSide = event.params.options & 1 ? 0 : 1
+  const expendInput = (event.params.options & 2) === 2
   const depthId = marketAddress
     .toHexString()
     .concat('-')
@@ -65,8 +66,16 @@ export function handleTakeOrder(event: TakeOrder): void {
       ? remainingTakenRawAmount
       : openOrderRemainingRawAmount
     openOrder.rawFilledAmount = openOrder.rawFilledAmount.plus(filledRawAmount)
-    openOrder.baseFilledAmount = openOrder.baseFilledAmount.plus(
-      orderBookContract.rawToBase(filledRawAmount, priceIndex, false),
+    const inputAmount =
+      isTakingBidSide === 1
+        ? orderBookContract.rawToBase(filledRawAmount, priceIndex, true)
+        : orderBookContract.rawToQuote(filledRawAmount)
+    const outputAmount =
+      isTakingBidSide === 1
+        ? orderBookContract.rawToQuote(filledRawAmount)
+        : orderBookContract.rawToBase(filledRawAmount, priceIndex, false)
+    openOrder.filledAmount = openOrder.filledAmount.plus(
+      expendInput ? inputAmount : outputAmount,
     )
     remainingTakenRawAmount = remainingTakenRawAmount.minus(filledRawAmount)
     openOrder.save()
