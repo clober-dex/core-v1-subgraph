@@ -53,7 +53,7 @@ export function handleNFTTransfer(event: Transfer): void {
     openOrder.rawFilledAmount = BigInt.zero()
     openOrder.filledAmount = BigInt.zero()
     openOrder.rawClaimedAmount = BigInt.zero()
-    openOrder.baseClaimedAmount = BigInt.zero()
+    openOrder.claimedAmount = BigInt.zero()
     openOrder.bountyAmount = orderInfo.claimBounty
     openOrder.createdAt = event.block.timestamp
     openOrder.txHash = event.transaction.hash.toHexString()

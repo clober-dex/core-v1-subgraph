@@ -105,8 +105,10 @@ export function handleClaimOrder(event: ClaimOrder): void {
   }
   const orderBookContract = OrderBookContract.bind(marketAddress)
   openOrder.rawClaimedAmount = openOrder.rawClaimedAmount.plus(claimedRawAmount)
-  openOrder.baseClaimedAmount = openOrder.baseClaimedAmount.plus(
-    orderBookContract.rawToBase(claimedRawAmount, priceIndex, isBid),
+  openOrder.claimedAmount = openOrder.claimedAmount.plus(
+    isBid
+      ? orderBookContract.rawToBase(claimedRawAmount, priceIndex, false)
+      : orderBookContract.rawToQuote(claimedRawAmount),
   )
   openOrder.save()
 }
