@@ -16,6 +16,9 @@ type Market @entity {
 
     latestPriceIndex: BigInt!
     latestPrice: BigInt!
+
+    maxPriceIndex: BigInt!
+    priceUpperBound: BigInt!
 }
 
 type Depth @entity {
