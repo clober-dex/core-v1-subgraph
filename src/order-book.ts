@@ -87,7 +87,7 @@ export function handleClaimOrder(event: ClaimOrder): void {
   const isBid = event.params.isBase
   const priceIndex = event.params.priceIndex
   const orderIndex = event.params.orderIndex
-  const rawAmount = event.params.rawAmount
+  const claimedRawAmount = event.params.rawAmount
   const nftId = encodeToNftId(isBid, priceIndex, orderIndex)
   const openOrderId = buildOpenOrderId(marketAddress, nftId)
   const openOrder = OpenOrder.load(openOrderId)
@@ -95,9 +95,9 @@ export function handleClaimOrder(event: ClaimOrder): void {
     return
   }
   const orderBookContract = OrderBookContract.bind(marketAddress)
-  openOrder.rawClaimedAmount = openOrder.rawClaimedAmount.plus(rawAmount)
+  openOrder.rawClaimedAmount = openOrder.rawClaimedAmount.plus(claimedRawAmount)
   openOrder.baseClaimedAmount = openOrder.baseClaimedAmount.plus(
-    orderBookContract.rawToBase(rawAmount, priceIndex, isBid),
+    orderBookContract.rawToBase(claimedRawAmount, priceIndex, isBid),
   )
   openOrder.save()
 }
