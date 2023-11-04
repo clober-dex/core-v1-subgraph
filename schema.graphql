@@ -56,7 +56,7 @@ type OpenOrder @entity {
     rawFilledAmount: BigInt!
     filledAmount: BigInt! # check
     rawClaimedAmount: BigInt!
-    claimedAmount: BigInt! # check
+    claimableAmount: BigInt! # check
     bountyAmount: BigInt!
     createdAt: BigInt!
     txHash: String!

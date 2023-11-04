@@ -7,7 +7,7 @@ import {
 } from '../generated/templates/OrderNFT/OrderBook'
 import { Depth, Market, OpenOrder } from '../generated/schema'
 
-import { buildOpenOrderId, encodeToNftId } from './helpers'
+import { buildOpenOrderId, buildOrderKey, encodeToNftId } from './helpers'
 
 export function handleTakeOrder(event: TakeOrder): void {
   const marketAddress = event.address
@@ -97,12 +97,10 @@ export function handleClaimOrder(event: ClaimOrder): void {
     return
   }
   const orderBookContract = OrderBookContract.bind(marketAddress)
-  openOrder.rawClaimedAmount = openOrder.rawClaimedAmount.plus(claimedRawAmount)
-  const claimableAmountExcludingFee = isBid
-    ? orderBookContract.rawToBase(claimedRawAmount, priceIndex, false)
-    : orderBookContract.rawToQuote(claimedRawAmount)
-  openOrder.claimedAmount = openOrder.claimedAmount.plus(
-    claimableAmountExcludingFee,
+  const claimableResult = orderBookContract.getClaimable(
+    buildOrderKey(isBid, priceIndex, orderIndex),
   )
+  openOrder.rawClaimedAmount = openOrder.rawClaimedAmount.plus(claimedRawAmount)
+  openOrder.claimableAmount = claimableResult.getClaimableAmount()
   openOrder.save()
 }
