@@ -62,6 +62,7 @@ export function handleTakeOrder(event: TakeOrder): void {
       ? remainingTakenRawAmount
       : openOrderRemainingRawAmount
 
+    remainingTakenRawAmount = remainingTakenRawAmount.minus(filledRawAmount)
     openOrder.rawFilledAmount = openOrder.rawFilledAmount.plus(filledRawAmount)
     openOrder.baseFilledAmount = orderBookContract.rawToBase(
       openOrder.rawFilledAmount,
@@ -73,7 +74,6 @@ export function handleTakeOrder(event: TakeOrder): void {
     if (openOrder.rawAmount == openOrder.rawFilledAmount) {
       currentOrderIndex = currentOrderIndex.plus(BigInt.fromI32(1))
     }
-    remainingTakenRawAmount = remainingTakenRawAmount.minus(filledRawAmount)
   }
 
   if (depthRawAmount.equals(BigInt.fromI32(0))) {
