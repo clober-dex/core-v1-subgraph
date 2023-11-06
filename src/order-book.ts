@@ -53,6 +53,10 @@ export function handleTakeOrder(event: TakeOrder): void {
       currentOrderIndex = currentOrderIndex.plus(BigInt.fromI32(1))
       continue
     }
+    const claimableResult = orderBookContract.getClaimable(
+      buildClaimKey(isTakingBidSide === 1, priceIndex, currentOrderIndex),
+    )
+    openOrder.claimableAmount = claimableResult.getClaimableAmount()
     const openOrderRemainingRawAmount = openOrder.rawAmount.minus(
       openOrder.rawFilledAmount,
     )
