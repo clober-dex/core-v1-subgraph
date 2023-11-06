@@ -40,6 +40,7 @@ export function handleNFTTransfer(event: Transfer): void {
   }
 
   if (from == ADDRESS_ZERO) {
+    // MakeOrder
     openOrder.market = marketAddress.toHexString()
     openOrder.priceIndex = BigInt.fromI32(priceIndex)
     openOrder.price = price
@@ -54,7 +55,7 @@ export function handleNFTTransfer(event: Transfer): void {
     openOrder.rawFilledAmount = BigInt.zero()
     openOrder.baseFilledAmount = BigInt.zero()
     openOrder.rawClaimedAmount = BigInt.zero()
-    openOrder.baseClaimedAmount = BigInt.zero()
+    openOrder.claimableAmount = BigInt.zero()
     openOrder.bountyAmount = orderInfo.claimBounty
     openOrder.createdAt = event.block.timestamp
     openOrder.txHash = event.transaction.hash.toHexString()
