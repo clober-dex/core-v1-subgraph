@@ -52,11 +52,11 @@ type OpenOrder @entity {
     isBid: Boolean!
     orderIndex: BigInt!
     rawAmount: BigInt!
-    amount: BigInt!
+    baseAmount: BigInt!
     rawFilledAmount: BigInt!
-    filledAmount: BigInt! # check
+    baseFilledAmount: BigInt!
     rawClaimedAmount: BigInt!
-    claimableAmount: BigInt! # check
+    claimableAmount: BigInt!
     bountyAmount: BigInt!
     createdAt: BigInt!
     txHash: String!

@@ -4,7 +4,10 @@ import { ERC20 } from '../generated/MarketFactory/ERC20'
 import { ERC20SymbolBytes } from '../generated/MarketFactory/ERC20SymbolBytes'
 import { ERC20NameBytes } from '../generated/MarketFactory/ERC20NameBytes'
 import { Token } from '../generated/schema'
-import { OrderBook__getOrderInputOrderKeyStruct } from '../generated/templates/OrderNFT/OrderBook'
+import {
+  OrderBook__getClaimableInputOrderKeyStruct,
+  OrderBook__getOrderInputOrderKeyStruct,
+} from '../generated/templates/OrderNFT/OrderBook'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 
@@ -31,6 +34,19 @@ export function buildOrderKey(
     ethereum.Value.fromUnsignedBigInt(orderIndex),
   ]
   return changetype<OrderBook__getOrderInputOrderKeyStruct>(fixedSizedArray)
+}
+
+export function buildClaimKey(
+  isBid: boolean,
+  priceIndex: i32,
+  orderIndex: BigInt,
+): OrderBook__getClaimableInputOrderKeyStruct {
+  const fixedSizedArray: Array<ethereum.Value> = [
+    ethereum.Value.fromBoolean(isBid),
+    ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(priceIndex)),
+    ethereum.Value.fromUnsignedBigInt(orderIndex),
+  ]
+  return changetype<OrderBook__getClaimableInputOrderKeyStruct>(fixedSizedArray)
 }
 
 export function isNullEthValue(value: string): boolean {

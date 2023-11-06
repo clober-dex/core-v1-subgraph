@@ -1,10 +1,13 @@
-import { BigInt, store } from '@graphprotocol/graph-ts'
+import { BigInt, ethereum, store } from '@graphprotocol/graph-ts'
 
 import {
   Transfer,
   OrderNFT as OrderNFTContract,
 } from '../generated/templates/OrderNFT/OrderNFT'
-import { OrderBook as OrderBookContract } from '../generated/templates/OrderNFT/OrderBook'
+import {
+  OrderBook as OrderBookContract,
+  OrderBook__getOrderInputOrderKeyStruct,
+} from '../generated/templates/OrderNFT/OrderBook'
 import { Depth, OpenOrder } from '../generated/schema'
 
 import {
@@ -47,11 +50,13 @@ export function handleNFTTransfer(event: Transfer): void {
     openOrder.isBid = bidSide
     openOrder.orderIndex = orderIndex
     openOrder.rawAmount = orderInfo.amount
-    openOrder.amount = bidSide
-      ? orderBookContract.rawToQuote(orderInfo.amount)
-      : orderBookContract.rawToBase(orderInfo.amount, priceIndex, true)
+    openOrder.baseAmount = orderBookContract.rawToBase(
+      orderInfo.amount,
+      priceIndex,
+      false,
+    )
     openOrder.rawFilledAmount = BigInt.zero()
-    openOrder.filledAmount = BigInt.zero()
+    openOrder.baseFilledAmount = BigInt.zero()
     openOrder.rawClaimedAmount = BigInt.zero()
     openOrder.claimableAmount = BigInt.zero()
     openOrder.bountyAmount = orderInfo.claimBounty
@@ -91,7 +96,7 @@ export function handleNFTTransfer(event: Transfer): void {
   depth.baseAmount = orderBookContract.rawToBase(
     depthRawAmount,
     priceIndex,
-    true,
+    false,
   )
 
   if (depthRawAmount.equals(BigInt.fromI32(0))) {

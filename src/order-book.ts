@@ -7,7 +7,7 @@ import {
 } from '../generated/templates/OrderNFT/OrderBook'
 import { Depth, Market, OpenOrder } from '../generated/schema'
 
-import { buildOpenOrderId, buildOrderKey, encodeToNftId } from './helpers'
+import { buildClaimKey, buildOpenOrderId, encodeToNftId } from './helpers'
 
 export function handleTakeOrder(event: TakeOrder): void {
   const marketAddress = event.address
@@ -36,11 +36,11 @@ export function handleTakeOrder(event: TakeOrder): void {
   depth.baseAmount = orderBookContract.rawToBase(
     depthRawAmount,
     priceIndex,
-    true,
+    false,
   )
 
   let currentOrderIndex = depth.latestTakenOrderIndex
-  let remainingTakenRawAmount = event.params.rawAmount
+  const remainingTakenRawAmount = event.params.rawAmount
   while (remainingTakenRawAmount.gt(BigInt.zero())) {
     const nftId = encodeToNftId(
       isTakingBidSide === 1,
@@ -48,32 +48,29 @@ export function handleTakeOrder(event: TakeOrder): void {
       currentOrderIndex,
     )
     const openOrderId = buildOpenOrderId(marketAddress, nftId)
-    const openOrder = OpenOrder.load(openOrderId)
-
-    currentOrderIndex = currentOrderIndex.plus(BigInt.fromI32(1))
-
-    if (openOrder === null) {
-      continue
-    }
-
+    const openOrder = OpenOrder.load(openOrderId) as OpenOrder
     const openOrderRemainingRawAmount = openOrder.rawAmount.minus(
       openOrder.rawFilledAmount,
     )
+
     const filledRawAmount = remainingTakenRawAmount.lt(
       openOrderRemainingRawAmount,
     )
       ? remainingTakenRawAmount
       : openOrderRemainingRawAmount
+
     openOrder.rawFilledAmount = openOrder.rawFilledAmount.plus(filledRawAmount)
-    const outputAmount =
-      isTakingBidSide === 1
-        ? orderBookContract.rawToQuote(filledRawAmount)
-        : orderBookContract.rawToBase(filledRawAmount, priceIndex, false)
-    openOrder.filledAmount = openOrder.filledAmount.plus(outputAmount)
-    remainingTakenRawAmount = remainingTakenRawAmount.minus(filledRawAmount)
+    openOrder.baseFilledAmount = orderBookContract.rawToBase(
+      openOrder.rawFilledAmount,
+      priceIndex,
+      false,
+    )
     openOrder.save()
+
+    if (openOrder.rawAmount === openOrder.rawFilledAmount) {
+      currentOrderIndex = currentOrderIndex.plus(BigInt.fromI32(1))
+    }
   }
-  depth.latestTakenOrderIndex = currentOrderIndex.minus(BigInt.fromI32(1))
 
   if (depthRawAmount.equals(BigInt.fromI32(0))) {
     store.remove('Depth', depthId)
@@ -92,13 +89,10 @@ export function handleClaimOrder(event: ClaimOrder): void {
   const claimedRawAmount = event.params.rawAmount
   const nftId = encodeToNftId(isBid, priceIndex, orderIndex)
   const openOrderId = buildOpenOrderId(marketAddress, nftId)
-  const openOrder = OpenOrder.load(openOrderId)
-  if (openOrder === null) {
-    return
-  }
+  const openOrder = OpenOrder.load(openOrderId) as OpenOrder
   const orderBookContract = OrderBookContract.bind(marketAddress)
   const claimableResult = orderBookContract.getClaimable(
-    buildOrderKey(isBid, priceIndex, orderIndex),
+    buildClaimKey(isBid, priceIndex, orderIndex),
   )
   openOrder.rawClaimedAmount = openOrder.rawClaimedAmount.plus(claimedRawAmount)
   openOrder.claimableAmount = claimableResult.getClaimableAmount()
