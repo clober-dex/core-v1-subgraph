@@ -41,6 +41,7 @@ export function handleNFTTransfer(event: Transfer): void {
 
   if (from == ADDRESS_ZERO) {
     // MakeOrder
+    openOrder.nftId = nftId
     openOrder.market = marketAddress.toHexString()
     openOrder.priceIndex = BigInt.fromI32(priceIndex)
     openOrder.price = price

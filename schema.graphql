@@ -46,6 +46,7 @@ type Token @entity {
 type OpenOrder @entity {
     # market address + "-" + nftId
     id: ID!
+    nftId: BigInt!
     market: Market!
     priceIndex: BigInt!
     price: BigInt!
