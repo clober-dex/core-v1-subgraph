@@ -1,13 +1,10 @@
-import { BigInt, ethereum, store } from '@graphprotocol/graph-ts'
+import { BigInt, store } from '@graphprotocol/graph-ts'
 
 import {
   Transfer,
   OrderNFT as OrderNFTContract,
 } from '../generated/templates/OrderNFT/OrderNFT'
-import {
-  OrderBook as OrderBookContract,
-  OrderBook__getOrderInputOrderKeyStruct,
-} from '../generated/templates/OrderNFT/OrderBook'
+import { OrderBook as OrderBookContract } from '../generated/templates/OrderNFT/OrderBook'
 import { Depth, OpenOrder } from '../generated/schema'
 
 import {

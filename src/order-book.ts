@@ -40,7 +40,7 @@ export function handleTakeOrder(event: TakeOrder): void {
   )
 
   let currentOrderIndex = depth.latestTakenOrderIndex
-  const remainingTakenRawAmount = event.params.rawAmount
+  let remainingTakenRawAmount = event.params.rawAmount
   while (remainingTakenRawAmount.gt(BigInt.zero())) {
     const nftId = encodeToNftId(
       isTakingBidSide === 1,
@@ -48,11 +48,14 @@ export function handleTakeOrder(event: TakeOrder): void {
       currentOrderIndex,
     )
     const openOrderId = buildOpenOrderId(marketAddress, nftId)
-    const openOrder = OpenOrder.load(openOrderId) as OpenOrder
+    const openOrder = OpenOrder.load(openOrderId)
+    if (openOrder === null) {
+      currentOrderIndex = currentOrderIndex.plus(BigInt.fromI32(1))
+      continue
+    }
     const openOrderRemainingRawAmount = openOrder.rawAmount.minus(
       openOrder.rawFilledAmount,
     )
-
     const filledRawAmount = remainingTakenRawAmount.lt(
       openOrderRemainingRawAmount,
     )
@@ -67,9 +70,10 @@ export function handleTakeOrder(event: TakeOrder): void {
     )
     openOrder.save()
 
-    if (openOrder.rawAmount === openOrder.rawFilledAmount) {
+    if (openOrder.rawAmount == openOrder.rawFilledAmount) {
       currentOrderIndex = currentOrderIndex.plus(BigInt.fromI32(1))
     }
+    remainingTakenRawAmount = remainingTakenRawAmount.minus(filledRawAmount)
   }
 
   if (depthRawAmount.equals(BigInt.fromI32(0))) {
@@ -89,7 +93,10 @@ export function handleClaimOrder(event: ClaimOrder): void {
   const claimedRawAmount = event.params.rawAmount
   const nftId = encodeToNftId(isBid, priceIndex, orderIndex)
   const openOrderId = buildOpenOrderId(marketAddress, nftId)
-  const openOrder = OpenOrder.load(openOrderId) as OpenOrder
+  const openOrder = OpenOrder.load(openOrderId)
+  if (openOrder === null) {
+    return
+  }
   const orderBookContract = OrderBookContract.bind(marketAddress)
   const claimableResult = orderBookContract.getClaimable(
     buildClaimKey(isBid, priceIndex, orderIndex),
