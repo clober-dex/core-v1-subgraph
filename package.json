@@ -7,10 +7,13 @@
     "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ core-v1-subgraph",
     "create-local": "graph create --node http://localhost:8020/ core-v1-subgraph",
     "create-devnet": "dotenv -e .env -- cross-var graph create --access-token=%ACCESS_TOKEN% --node http://dev-subgraph.coupon.finance:8020/ core-v1-subgraph",
+    "create-testnet": "dotenv -e .env -- cross-var graph create --access-token=%ACCESS_TOKEN% --node http://dev-subgraph.coupon.finance:8020/ core-v1-subgraph",
     "remove-local": "graph remove --node http://localhost:8020/ core-v1-subgraph",
     "remove-devnet": "graph remove --node http://dev-subgraph.coupon.finance:8020/ core-v1-subgraph",
+    "remove-testnet": "graph remove --node http://dev-subgraph.coupon.finance:8020/ core-v1-subgraph",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 core-v1-subgraph --network localhost",
     "deploy-devnet": "dotenv -e .env -- cross-var graph deploy --access-token=%ACCESS_TOKEN% --node http://dev-subgraph.coupon.finance:8020/ --ipfs http://dev-subgraph.coupon.finance:5001 core-v1-subgraph --network localhost",
+    "deploy-testnet": "dotenv -e .env -- cross-var graph deploy --access-token=%ACCESS_TOKEN% --node http://dev-subgraph.coupon.finance:8020/ --ipfs http://dev-subgraph.coupon.finance:5001 core-v1-subgraph --network arbitrum-goerli",
     "test": "graph test"
   },
   "dependencies": {
