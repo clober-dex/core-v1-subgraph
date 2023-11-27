@@ -13,6 +13,7 @@
     "remove-testnet": "graph remove --node http://dev-subgraph.coupon.finance:8020/ core-v1-subgraph",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 core-v1-subgraph --network localhost",
     "deploy-devnet": "dotenv -e .env -- cross-var graph deploy --access-token=%ACCESS_TOKEN% --node http://dev-subgraph.coupon.finance:8020/ --ipfs http://dev-subgraph.coupon.finance:5001 core-v1-subgraph --network localhost",
+    "deploy-arbitrum": "dotenv -e .env -- cross-var graph deploy core-v1-subgraph --version-label %DEPLOY_VERSION% --node https://subgraphs.alchemy.com/api/subgraphs/deploy --deploy-key %DEPLOY_KEY% --ipfs https://ipfs.satsuma.xyz --network arbitrum-one",
     "deploy-testnet": "dotenv -e .env -- cross-var graph deploy --access-token=%ACCESS_TOKEN% --node http://dev-subgraph.coupon.finance:8020/ --ipfs http://dev-subgraph.coupon.finance:5001 core-v1-subgraph --network arbitrum-goerli",
     "test": "graph test"
   },
