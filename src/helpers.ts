@@ -1,4 +1,10 @@
-import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  TypedMap,
+} from '@graphprotocol/graph-ts'
 
 import { ERC20 } from '../generated/MarketFactory/ERC20'
 import { ERC20SymbolBytes } from '../generated/MarketFactory/ERC20SymbolBytes'
@@ -11,6 +17,20 @@ import {
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 
+export const CHART_LOG_INTERVALS = new TypedMap<string, number>()
+CHART_LOG_INTERVALS.set('1m', 60)
+CHART_LOG_INTERVALS.set('3m', 3 * 60)
+CHART_LOG_INTERVALS.set('5m', 5 * 60)
+CHART_LOG_INTERVALS.set('10m', 10 * 60)
+CHART_LOG_INTERVALS.set('15m', 15 * 60)
+CHART_LOG_INTERVALS.set('30m', 30 * 60)
+CHART_LOG_INTERVALS.set('1h', 60 * 60)
+CHART_LOG_INTERVALS.set('2h', 2 * 60 * 60)
+CHART_LOG_INTERVALS.set('4h', 4 * 60 * 60)
+CHART_LOG_INTERVALS.set('6h', 6 * 60 * 60)
+CHART_LOG_INTERVALS.set('1d', 24 * 60 * 60)
+CHART_LOG_INTERVALS.set('1w', 7 * 24 * 60 * 60)
+
 export function createToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString())
   if (token === null) {
@@ -21,6 +41,15 @@ export function createToken(tokenAddress: Address): Token {
   }
   token.save()
   return token
+}
+
+export function getBigDecimalPrice(
+  price: BigInt,
+  decimals: u8 = 18 as u8,
+): BigDecimal {
+  return BigDecimal.fromString(price.toString()).div(
+    BigDecimal.fromString(BigInt.fromString('10').pow(decimals).toString()),
+  )
 }
 
 export function buildOrderKey(
@@ -61,6 +90,19 @@ export function buildOpenOrderId(
   nftId: BigInt,
 ): string {
   return marketAddress.toHexString().concat('-').concat(nftId.toString())
+}
+
+export function buildChartLogId(
+  marketAddress: Address,
+  intervalType: string,
+  timestamp: number,
+): string {
+  return marketAddress
+    .toHexString()
+    .concat('-')
+    .concat(intervalType)
+    .concat('-')
+    .concat(timestamp.toString())
 }
 
 export function encodeToNftId(

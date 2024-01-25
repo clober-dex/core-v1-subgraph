@@ -5,9 +5,16 @@ import {
   TakeOrder,
   ClaimOrder,
 } from '../generated/templates/OrderNFT/OrderBook'
-import { Depth, Market, OpenOrder } from '../generated/schema'
+import { ChartLog, Depth, Market, OpenOrder, Token } from '../generated/schema'
 
-import { buildClaimKey, buildOpenOrderId, encodeToNftId } from './helpers'
+import {
+  buildChartLogId,
+  buildClaimKey,
+  buildOpenOrderId,
+  CHART_LOG_INTERVALS,
+  encodeToNftId,
+  getBigDecimalPrice,
+} from './helpers'
 
 export function handleTakeOrder(event: TakeOrder): void {
   const marketAddress = event.address
@@ -30,14 +37,24 @@ export function handleTakeOrder(event: TakeOrder): void {
     priceIndex,
   )
   const price = orderBookContract.indexToPrice(priceIndex)
+  const bigDecimalPrice = getBigDecimalPrice(price)
   market.latestPriceIndex = BigInt.fromI32(priceIndex)
   market.latestPrice = price
   depth.rawAmount = depthRawAmount
-  depth.baseAmount = orderBookContract.rawToBase(
+  const newBaseAmount = orderBookContract.rawToBase(
     depthRawAmount,
     priceIndex,
     false,
   )
+  const baseAmountDeltaAbs = newBaseAmount.minus(depth.baseAmount).abs()
+  const baseToken = Token.load(market.baseToken)
+  const baseTokenDecimals =
+    baseToken !== null ? baseToken.decimals.toI32() : (18 as i32)
+  const bigDecimalBaseAmountDeltaAbs = getBigDecimalPrice(
+    baseAmountDeltaAbs,
+    baseTokenDecimals as u8,
+  )
+  depth.baseAmount = newBaseAmount
 
   let currentOrderIndex = depth.latestTakenOrderIndex
   let remainingTakenRawAmount = event.params.rawAmount
@@ -87,6 +104,44 @@ export function handleTakeOrder(event: TakeOrder): void {
   }
 
   market.save()
+
+  // update chart
+  for (let i = 0; i < CHART_LOG_INTERVALS.entries.length; i++) {
+    const entry = CHART_LOG_INTERVALS.entries[i]
+    const intervalType = entry.key
+    const intervalInNumber = entry.value
+    const timestampForAcc =
+      Math.floor((event.block.timestamp.toI64() as number) / intervalInNumber) *
+      intervalInNumber
+    const chartLogId = buildChartLogId(
+      marketAddress,
+      intervalType,
+      timestampForAcc,
+    )
+    let chartLog = ChartLog.load(chartLogId)
+    if (chartLog === null) {
+      chartLog = new ChartLog(chartLogId)
+      chartLog.market = marketAddress.toHexString()
+      chartLog.intervalType = intervalType
+      chartLog.timestamp = BigInt.fromString(timestampForAcc.toString())
+      chartLog.high = bigDecimalPrice
+      chartLog.low = bigDecimalPrice
+      chartLog.close = bigDecimalPrice
+      chartLog.baseVolume = bigDecimalBaseAmountDeltaAbs
+    } else {
+      if (bigDecimalPrice.gt(chartLog.high)) {
+        chartLog.high = bigDecimalPrice
+      }
+      if (bigDecimalPrice.lt(chartLog.low)) {
+        chartLog.low = bigDecimalPrice
+      }
+      chartLog.close = bigDecimalPrice
+      chartLog.baseVolume = chartLog.baseVolume.plus(
+        bigDecimalBaseAmountDeltaAbs,
+      )
+    }
+    chartLog.save()
+  }
 }
 
 export function handleClaimOrder(event: ClaimOrder): void {
