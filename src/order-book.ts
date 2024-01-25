@@ -41,12 +41,16 @@ export function handleTakeOrder(event: TakeOrder): void {
   market.latestPriceIndex = BigInt.fromI32(priceIndex)
   market.latestPrice = price
   depth.rawAmount = depthRawAmount
-  const newBaseAmount = orderBookContract.rawToBase(
+  depth.baseAmount = orderBookContract.rawToBase(
     depthRawAmount,
     priceIndex,
     false,
   )
-  const baseAmountDeltaAbs = newBaseAmount.minus(depth.baseAmount).abs()
+  const baseAmountDeltaAbs = orderBookContract.rawToBase(
+    event.params.rawAmount,
+    priceIndex,
+    false,
+  )
   const baseToken = Token.load(market.baseToken)
   const baseTokenDecimals =
     baseToken !== null ? baseToken.decimals.toI32() : (18 as i32)
@@ -54,7 +58,6 @@ export function handleTakeOrder(event: TakeOrder): void {
     baseAmountDeltaAbs,
     baseTokenDecimals as u8,
   )
-  depth.baseAmount = newBaseAmount
 
   let currentOrderIndex = depth.latestTakenOrderIndex
   let remainingTakenRawAmount = event.params.rawAmount
