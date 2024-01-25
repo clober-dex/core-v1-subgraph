@@ -72,6 +72,7 @@ type ChartLog @entity {
     intervalType: String!
     # normalized candle timestamp of the block where this trade occurred (second)
     timestamp: BigInt!
+    open: BigDecimal!
     high: BigDecimal!
     low: BigDecimal!
     close: BigDecimal!

@@ -124,6 +124,7 @@ export function handleTakeOrder(event: TakeOrder): void {
       chartLog.market = marketAddress.toHexString()
       chartLog.intervalType = intervalType
       chartLog.timestamp = BigInt.fromString(timestampForAcc.toString())
+      chartLog.open = bigDecimalPrice
       chartLog.high = bigDecimalPrice
       chartLog.low = bigDecimalPrice
       chartLog.close = bigDecimalPrice
