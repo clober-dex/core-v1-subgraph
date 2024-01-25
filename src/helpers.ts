@@ -95,7 +95,7 @@ export function buildOpenOrderId(
 export function buildChartLogId(
   marketAddress: Address,
   intervalType: string,
-  timestamp: number,
+  timestamp: i64,
 ): string {
   return marketAddress
     .toHexString()

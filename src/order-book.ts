@@ -1,9 +1,9 @@
 import { BigInt, store } from '@graphprotocol/graph-ts'
 
 import {
+  ClaimOrder,
   OrderBook as OrderBookContract,
   TakeOrder,
-  ClaimOrder,
 } from '../generated/templates/OrderNFT/OrderBook'
 import { ChartLog, Depth, Market, OpenOrder, Token } from '../generated/schema'
 
@@ -113,9 +113,9 @@ export function handleTakeOrder(event: TakeOrder): void {
     const entry = CHART_LOG_INTERVALS.entries[i]
     const intervalType = entry.key
     const intervalInNumber = entry.value
-    const timestampForAcc =
-      Math.floor((event.block.timestamp.toI64() as number) / intervalInNumber) *
-      intervalInNumber
+    const timestampForAcc = (Math.floor(
+      event.block.timestamp.toI64() / intervalInNumber,
+    ) * intervalInNumber) as i64
     const chartLogId = buildChartLogId(
       marketAddress,
       intervalType,
