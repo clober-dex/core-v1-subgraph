@@ -114,7 +114,7 @@ export function handleTakeOrder(event: TakeOrder): void {
     const intervalType = entry.key
     const intervalInNumber = entry.value
     const timestampForAcc = (Math.floor(
-      event.block.timestamp.toI64() / intervalInNumber,
+      (event.block.timestamp.toI64() as number) / intervalInNumber,
     ) * intervalInNumber) as i64
     const chartLogId = buildChartLogId(
       marketAddress,
