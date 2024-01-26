@@ -13,7 +13,7 @@ import {
   buildOpenOrderId,
   CHART_LOG_INTERVALS,
   encodeToNftId,
-  getBigDecimalPrice,
+  formatUnits,
 } from './helpers'
 
 export function handleTakeOrder(event: TakeOrder): void {
@@ -37,7 +37,7 @@ export function handleTakeOrder(event: TakeOrder): void {
     priceIndex,
   )
   const price = orderBookContract.indexToPrice(priceIndex)
-  const bigDecimalPrice = getBigDecimalPrice(price)
+  const bigDecimalPrice = formatUnits(price)
   market.latestPriceIndex = BigInt.fromI32(priceIndex)
   market.latestPrice = price
   depth.rawAmount = depthRawAmount
@@ -46,7 +46,7 @@ export function handleTakeOrder(event: TakeOrder): void {
     priceIndex,
     false,
   )
-  const baseAmountDeltaAbs = orderBookContract.rawToBase(
+  const baseAmount = orderBookContract.rawToBase(
     event.params.rawAmount,
     priceIndex,
     false,
@@ -54,10 +54,7 @@ export function handleTakeOrder(event: TakeOrder): void {
   const baseToken = Token.load(market.baseToken)
   const baseTokenDecimals =
     baseToken !== null ? baseToken.decimals.toI32() : (18 as i32)
-  const bigDecimalBaseAmountDeltaAbs = getBigDecimalPrice(
-    baseAmountDeltaAbs,
-    baseTokenDecimals as u8,
-  )
+  const bigDecimalBaseAmount = formatUnits(baseAmount, baseTokenDecimals as u8)
 
   let currentOrderIndex = depth.latestTakenOrderIndex
   let remainingTakenRawAmount = event.params.rawAmount
@@ -131,7 +128,7 @@ export function handleTakeOrder(event: TakeOrder): void {
       chartLog.high = bigDecimalPrice
       chartLog.low = bigDecimalPrice
       chartLog.close = bigDecimalPrice
-      chartLog.baseVolume = bigDecimalBaseAmountDeltaAbs
+      chartLog.baseVolume = bigDecimalBaseAmount
     } else {
       if (bigDecimalPrice.gt(chartLog.high)) {
         chartLog.high = bigDecimalPrice
@@ -140,9 +137,7 @@ export function handleTakeOrder(event: TakeOrder): void {
         chartLog.low = bigDecimalPrice
       }
       chartLog.close = bigDecimalPrice
-      chartLog.baseVolume = chartLog.baseVolume.plus(
-        bigDecimalBaseAmountDeltaAbs,
-      )
+      chartLog.baseVolume = chartLog.baseVolume.plus(bigDecimalBaseAmount)
     }
     chartLog.save()
   }

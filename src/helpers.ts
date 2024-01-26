@@ -43,7 +43,7 @@ export function createToken(tokenAddress: Address): Token {
   return token
 }
 
-export function getBigDecimalPrice(
+export function formatUnits(
   price: BigInt,
   decimals: u8 = 18 as u8,
 ): BigDecimal {
