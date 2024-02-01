@@ -9,10 +9,12 @@
     "create-devnet": "dotenv -e .env -- cross-var graph create --access-token=%ACCESS_TOKEN% --node http://dev-subgraph.coupon.finance:8020/ core-v1-subgraph",
     "create-testnet": "dotenv -e .env -- cross-var graph create --access-token=%ACCESS_TOKEN% --node http://dev-subgraph.coupon.finance:8020/ core-v1-subgraph",
     "create-skale-testnet": "dotenv -e .env -- cross-var graph create --access-token=%ACCESS_TOKEN% --node http://34.64.122.153:8020/ core-v1-subgraph",
+    "create-sei-testnet": "dotenv -e .env -- cross-var graph create --access-token=%ACCESS_TOKEN% --node http://34.64.169.78:8020/ core-v1-subgraph",
     "remove-local": "graph remove --node http://localhost:8020/ core-v1-subgraph",
     "remove-devnet": "graph remove --node http://dev-subgraph.coupon.finance:8020/ core-v1-subgraph",
     "remove-testnet": "graph remove --node http://dev-subgraph.coupon.finance:8020/ core-v1-subgraph",
     "remove-skale-testnet": "graph remove --node http://34.64.122.153:8020/ core-v1-subgraph",
+    "remove-sei-testnet": "graph remove --node http://34.64.169.78:8020/ core-v1-subgraph",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 core-v1-subgraph --network localhost",
     "deploy-devnet": "dotenv -e .env -- cross-var graph deploy --access-token=%ACCESS_TOKEN% --node http://dev-subgraph.coupon.finance:8020/ --ipfs http://dev-subgraph.coupon.finance:5001 core-v1-subgraph --network localhost",
     "deploy-arbitrum": "dotenv -e .env -- cross-var graph deploy core-v1-subgraph --version-label %DEPLOY_VERSION% --node https://subgraphs.alchemy.com/api/subgraphs/deploy --deploy-key %DEPLOY_KEY% --ipfs https://ipfs.satsuma.xyz --network arbitrum-one",
@@ -20,6 +22,7 @@
     "deploy-zkevm": "dotenv -e .env -- cross-var graph deploy core-v1-subgraph-zkevm --version-label %DEPLOY_VERSION% --node https://subgraphs.alchemy.com/api/subgraphs/deploy --deploy-key %DEPLOY_KEY% --ipfs https://ipfs.satsuma.xyz --network polygon-zkevm",
     "deploy-testnet": "dotenv -e .env -- cross-var graph deploy --access-token=%ACCESS_TOKEN% --node http://dev-subgraph.coupon.finance:8020/ --ipfs http://dev-subgraph.coupon.finance:5001 core-v1-subgraph --network arbitrum-goerli",
     "deploy-skale-testnet": "dotenv -e .env -- cross-var graph deploy --access-token=%ACCESS_TOKEN% --node http://34.64.122.153:8020/ --ipfs http://34.64.122.153:5001 core-v1-subgraph --network skale-testnet",
+    "deploy-sei-testnet": "dotenv -e .env -- cross-var graph deploy --access-token=%ACCESS_TOKEN% --node http://34.64.169.78:8020/ --ipfs http://34.64.169.78:5001 core-v1-subgraph --network sei-testnet",
     "test": "graph test"
   },
   "dependencies": {

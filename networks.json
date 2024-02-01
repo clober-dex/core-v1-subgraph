@@ -34,5 +34,11 @@
       "address": "0x18C2B4C4669277565b977F174796699656dE4175",
       "startBlock": 3810500
     }
+  },
+  "sei-testnet": {
+    "MarketFactory": {
+      "address": "0x84EEC26199aFa84a8698c6fA9Cf7bB91DE681222",
+      "startBlock": 1144870
+    }
   }
 }
