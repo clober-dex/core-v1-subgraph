@@ -40,5 +40,11 @@
       "address": "0x84EEC26199aFa84a8698c6fA9Cf7bB91DE681222",
       "startBlock": 1144870
     }
+  },
+  "bera-testnet": {
+    "MarketFactory": {
+      "address": "0x9C6C405cbB2c1DC7aAAa65156744fC00efc7EC82",
+      "startBlock": 367900
+    }
   }
 }
