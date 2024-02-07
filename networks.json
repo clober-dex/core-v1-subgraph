@@ -37,8 +37,8 @@
   },
   "sei-testnet": {
     "MarketFactory": {
-      "address": "0x84EEC26199aFa84a8698c6fA9Cf7bB91DE681222",
-      "startBlock": 1144870
+      "address": "0x83783e6bAB9fA2131f04C31EFbEE404E9a512DED",
+      "startBlock": 2074700
     }
   },
   "bera-testnet": {
