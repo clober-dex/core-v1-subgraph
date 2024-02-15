@@ -46,5 +46,11 @@
       "address": "0x9C6C405cbB2c1DC7aAAa65156744fC00efc7EC82",
       "startBlock": 367900
     }
+  },
+  "berachain-public-testnet": {
+    "MarketFactory": {
+      "address": "0x9C6C405cbB2c1DC7aAAa65156744fC00efc7EC82",
+      "startBlock": 367900
+    }
   }
 }

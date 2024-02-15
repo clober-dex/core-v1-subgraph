@@ -10,13 +10,11 @@
     "create-testnet": "dotenv -e .env -- cross-var graph create --access-token=%ACCESS_TOKEN% --node http://dev-subgraph.coupon.finance:8020/ core-v1-subgraph",
     "create-skale-testnet": "dotenv -e .env -- cross-var graph create --access-token=%ACCESS_TOKEN% --node http://34.64.218.22:8020/ core-v1-subgraph",
     "create-sei-testnet": "dotenv -e .env -- cross-var graph create --access-token=%ACCESS_TOKEN% --node http://34.22.80.52:8020/ core-v1-subgraph",
-    "create-bera-testnet": "dotenv -e .env -- cross-var graph create --access-token=%ACCESS_TOKEN% --node http://34.64.82.156:8020/ core-v1-subgraph",
     "remove-local": "graph remove --node http://localhost:8020/ core-v1-subgraph",
     "remove-devnet": "graph remove --node http://dev-subgraph.coupon.finance:8020/ core-v1-subgraph",
     "remove-testnet": "graph remove --node http://dev-subgraph.coupon.finance:8020/ core-v1-subgraph",
     "remove-skale-testnet": "graph remove --node http://34.64.218.22:8020/ core-v1-subgraph",
     "remove-sei-testnet": "graph remove --node http://34.22.80.52:8020/ core-v1-subgraph",
-    "remove-bera-testnet": "graph remove --node http://34.64.82.156:8020/ core-v1-subgraph",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 core-v1-subgraph --network localhost",
     "deploy-devnet": "dotenv -e .env -- cross-var graph deploy --access-token=%ACCESS_TOKEN% --node http://dev-subgraph.coupon.finance:8020/ --ipfs http://dev-subgraph.coupon.finance:5001 core-v1-subgraph --network localhost",
     "deploy-arbitrum": "dotenv -e .env -- cross-var graph deploy core-v1-subgraph --version-label %DEPLOY_VERSION% --node https://subgraphs.alchemy.com/api/subgraphs/deploy --deploy-key %DEPLOY_KEY% --ipfs https://ipfs.satsuma.xyz --network arbitrum-one",
@@ -25,7 +23,7 @@
     "deploy-testnet": "dotenv -e .env -- cross-var graph deploy --access-token=%ACCESS_TOKEN% --node http://dev-subgraph.coupon.finance:8020/ --ipfs http://dev-subgraph.coupon.finance:5001 core-v1-subgraph --network arbitrum-goerli",
     "deploy-skale-testnet": "dotenv -e .env -- cross-var graph deploy --access-token=%ACCESS_TOKEN% --node http://34.64.218.22:8020/ --ipfs http://34.64.218.22:5001 core-v1-subgraph --network skale-testnet",
     "deploy-sei-testnet": "dotenv -e .env -- cross-var graph deploy --access-token=%ACCESS_TOKEN% --node http://34.22.80.52:8020/ --ipfs http://34.22.80.52:5001 core-v1-subgraph --network sei-testnet",
-    "deploy-bera-testnet": "dotenv -e .env -- cross-var graph deploy --access-token=%ACCESS_TOKEN% --node http://34.64.82.156:8020/ --ipfs http://34.64.82.156:5001 core-v1-subgraph --network bera-testnet",
+    "deploy-berachain-public-testnet": "dotenv -e .env -- cross-var graph build --network=berachain-public-testnet && goldsky subgraph deploy core-v1-subgraph/%DEPLOY_VERSION%",
     "test": "graph test"
   },
   "dependencies": {
